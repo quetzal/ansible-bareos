@@ -1,0 +1,27 @@
+---
+- name: Install Packages
+  apt: name={{ item }} state=present
+  with_items:
+    - bareos-client
+    - bareos-filedaemon-python-plugin
+    - percona-xtrabackup
+
+- name: Push Bareos-Client configuration files
+  template: src={{item.src}} dest={{item.dest}}  mode=0640 owner=bareos group=bareos
+  with_items:
+      - { src: 'client/myself.conf', dest: '/etc/bareos/bareos-fd.d/client/myself.conf' }
+      - { src: 'director/bareos-dir.conf', dest: '/etc/bareos/bareos-fd.d/director/bareos-dir.conf' }
+      - { src: 'director/bareos-mon.conf', dest: '/etc/bareos/bareos-fd.d/director/bareos-mon.conf' }
+      - { src: 'messages/Standard.conf', dest: '/etc/bareos/bareos-fd.d/messages/Standard.conf' }
+  notify: reload bareos-client
+
+- name: Copy Bareos mysql backup plugin
+  copy: src={{item}} dest=/usr/lib/bareos/plugins mode=0640 owner=bareos group=bareos
+  with_items:
+     - plugins/bareos-fd-percona.py
+     - plugins/BareosFdPercona.py
+  notify: reload bareos-client
+  
+- name: Enable bareos client service
+  action: service name=bareos-fd state=started enabled=yes
+

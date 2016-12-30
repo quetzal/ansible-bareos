@@ -1,0 +1,6 @@
+bareos_version: 16.2
+director_password: AAAAAAAAAAAAAAAA
+client_password: BBBBBBBBBBBBBBBBB
+storage_password: CCCCCCCCCCCCCCCC
+restricted_console_password: DDDDDDDDDDDDD
+storage_location: /var/lib/bareos/storage

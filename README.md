@@ -9,4 +9,7 @@ It's not perfect, but it work with bareos-webui.
 
 
 
-It deploys 1 director, 1 storage with local backup device and any number of clients. Modify roles/bareos-dir/templates/bareos-dir.conf to change backup job definitions. Change passwords in group_vars/all
+It deploys 1 director, 1 storage with local backup device and any number of clients. Modify roles/bareos-dir/templates/bareos-dir.d/ to change backup job definitions.
+Il you add some file, add them to tasks. Change passwords in group_vars/all
+
+It include bareos-xtrabackup plugin for mysql-like backups: https://github.com/bareos/bareos-contrib/tree/master/fd-plugins/bareos_percona

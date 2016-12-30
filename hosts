@@ -1,0 +1,15 @@
+[director]
+#only one host here
+backup-host
+
+[storage]
+#only one host here
+backup-host
+
+[clients]
+client1
+client2
+client3
+
+[clients_mysql]
+client2

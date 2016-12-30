@@ -1,0 +1,2 @@
+- name: reload bareos-dir
+  action: service name=bareos-dir state=restarted

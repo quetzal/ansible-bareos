@@ -1,0 +1,2 @@
+- name: reload bareos-storage
+  action: service name=bareos-sd state=restarted

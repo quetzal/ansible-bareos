@@ -1,0 +1,60 @@
+---
+- name: Install Packages
+  apt: name={{ item }} state=present
+  with_items:
+    - bareos-director
+    - bareos-database-postgresql
+    - postgresql
+    - bareos-bconsole
+    - bareos-webui
+    
+- name: enable postgresqld service
+  action: service name=postgresql state=started enabled=yes 
+
+- name: ensure blocking default file not present
+  file: path=/etc/bareos/bareos-dir.d/job/backup-bareos-fd.conf state=absent
+
+- name: Push Bareos-Dir configuration file
+  template: src={{item.src}} dest={{item.dest}}  mode=0640 owner=bareos group=bareos
+  with_items:
+      - { src: 'bareos-dir.d/catalog/MyCatalog.conf', dest: '/etc/bareos/bareos-dir.d/catalog/MyCatalog.conf' }
+      - { src: 'bareos-dir.d/client/bareos-fd.conf', dest: '/etc/bareos/bareos-dir.d/client/bareos-fd.conf' }
+      - { src: 'bareos-dir.d/console/bareos-mon.conf', dest: '/etc/bareos/bareos-dir.d/console/bareos-mon.conf' }
+      - { src: 'bareos-dir.d/director/bareos-dir.conf', dest: '/etc/bareos/bareos-dir.d/director/bareos-dir.conf' }
+      - { src: 'bareos-dir.d/fileset/Catalog.conf', dest: '/etc/bareos/bareos-dir.d/fileset/Catalog.conf' }
+      - { src: 'bareos-dir.d/fileset/Etc.conf', dest: '/etc/bareos/bareos-dir.d/fileset/Etc.conf' }
+      - { src: 'bareos-dir.d/fileset/Full.conf', dest: '/etc/bareos/bareos-dir.d/fileset/Full.conf' }
+      - { src: 'bareos-dir.d/fileset/Windows All Drives.conf', dest: '/etc/bareos/bareos-dir.d/fileset/Windows All Drives.conf' }
+      - { src: 'bareos-dir.d/job/Default.conf', dest: '/etc/bareos/bareos-dir.d/job/Default.conf' }
+      - { src: 'bareos-dir.d/job/BackupCatalog.conf', dest: '/etc/bareos/bareos-dir.d/job/BackupCatalog.conf' }
+      - { src: 'bareos-dir.d/jobdefs/DefaultJob.conf', dest: '/etc/bareos/bareos-dir.d/jobdefs/DefaultJob.conf' }
+      - { src: 'bareos-dir.d/messages/Daemon.conf', dest: '/etc/bareos/bareos-dir.d/messages/Daemon.conf' }
+      - { src: 'bareos-dir.d/messages/Standard.conf', dest: '/etc/bareos/bareos-dir.d/messages/Standard.conf'}
+      - { src: 'bareos-dir.d/pool/Default.conf', dest: '/etc/bareos/bareos-dir.d/pool/Default.conf' }
+      - { src: 'bareos-dir.d/pool/Daily.conf', dest: '/etc/bareos/bareos-dir.d/pool/Daily.conf' }
+      - { src: 'bareos-dir.d/pool/Monthly.conf', dest: '/etc/bareos/bareos-dir.d/pool/Monthly.conf' }
+      - { src: 'bareos-dir.d/pool/Weekly.conf', dest: '/etc/bareos/bareos-dir.d/pool/Weekly.conf' }
+      - { src: 'bareos-dir.d/pool/Scratch.conf', dest: '/etc/bareos/bareos-dir.d/pool/Scratch.conf' }
+      - { src: 'bareos-dir.d/schedule/WeeklyCycle.conf', dest: '/etc/bareos/bareos-dir.d/schedule/WeeklyCycle.conf' }
+      - { src: 'bareos-dir.d/schedule/WeeklyCycleAfterBackup.conf', dest: '/etc/bareos/bareos-dir.d/schedule/WeeklyCycleAfterBackup.conf' }
+      - { src: 'bareos-dir.d/schedule/DailyCycle.conf', dest: '/etc/bareos/bareos-dir.d/schedule/DailyCycle.conf' }
+      - { src: 'bareos-dir.d/storage/File.conf', dest: '/etc/bareos/bareos-dir.d/storage/File.conf' }
+      - { src: 'bareos-dir.d/fileset/Mysql.conf', dest: '/etc/bareos/bareos-dir.d/fileset/Mysql.conf' }
+      - { src: 'bareos-dir.d/job/Mysql.conf', dest: '/etc/bareos/bareos-dir.d/job/Mysql.conf' }
+      - { src: 'bareos-dir.d/jobdefs/MysqlJob.conf', dest: '/etc/bareos/bareos-dir.d/jobdefs/MysqlJob.conf' }
+
+  notify: reload bareos-dir
+
+- name: Push bconsole configuration file
+  template: src=bconsole.conf dest=/etc/bareos/bconsole.conf mode=0640 owner=root group=bareos
+
+#Create baroes database
+#- name: create bareos database
+#  command:  su - postgres -c /usr/lib/bareos/scripts/create_bareos_database
+#- name: create tables 
+#  command: su - postgres -c /usr/lib/bareos/scripts/make_bareos_tables
+#- name: grant privs
+#  command: su - postgres -c /usr/lib/bareos/scripts/grant_bareos_privileges
+  
+- name: enable bareos director service
+  action: service name=bareos-dir state=started enabled=yes 

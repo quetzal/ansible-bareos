@@ -1,0 +1,2 @@
+- name: reload bareos-client
+  action: service name=bareos-fd state=restarted
